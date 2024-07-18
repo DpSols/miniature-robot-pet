@@ -8,15 +8,15 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @AllArgsConstructor
 @Data
-@Table("user_dto")
+@Table("users")
 public class User {
     @Id
-    @Column("user_id")
+    @Column("id")
     private int id;
 
-    @Column("user_name")
+    @Column("name")
     private String name;
 
-    @Column("user_age")
+    @Column("age")
     private int age;
 }
