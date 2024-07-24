@@ -17,21 +17,19 @@ public class UserController {
 
     @GetMapping("/")
     public Flux<User> getAllUser(@RequestParam(required = false) String name, @RequestParam(required = false) SortingParam sortingParam) {
+        Flux<User> users;
+
         if (name != null && !name.isEmpty()) {
-            if (sortingParam != null) {
-                return userService.getByName(name)
-                        .sort(new ByAgeComparator(sortingParam));
-            } else {
-                return userService.getByName(name);
-            }
+            users = userService.getByName(name);
+        }else {
+            users = userService.getAll();
         }
 
         if (sortingParam != null) {
-            return userService.getAll()
-                    .sort(new ByAgeComparator(sortingParam));
-        } else {
-            return userService.getAll();
+            users = users.sort(new ByAgeComparator(sortingParam));
         }
+
+        return users;
     }
 
     @PostMapping("/")

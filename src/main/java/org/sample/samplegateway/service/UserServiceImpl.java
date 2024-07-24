@@ -29,11 +29,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> create(User user) {
+        if (user.getName().isEmpty() || user.getAge() < 3) {
+            return Mono.error(new IllegalArgumentException("Name and age must be provided"));
+        }
+
         return userDatasource.create(user);
     }
 
     @Override
     public Mono<User> update(User user) {
+        if (user.getName().isEmpty() || user.getAge() < 3) {
+            return Mono.error(new IllegalArgumentException("Name and age must be provided"));
+        }
+
         return userDatasource.update(user);
     }
 
