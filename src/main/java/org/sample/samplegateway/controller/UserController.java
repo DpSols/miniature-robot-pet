@@ -1,7 +1,7 @@
 package org.sample.samplegateway.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.sample.samplegateway.comparator.ByAgeComparator;
+import org.sample.samplegateway.comparator.ByUserAgeComparator;
 import org.sample.samplegateway.model.SortingParam;
 import org.sample.samplegateway.model.User;
 import org.sample.samplegateway.service.UserService;
@@ -17,19 +17,8 @@ public class UserController {
 
     @GetMapping("/")
     public Flux<User> getAllUser(@RequestParam(required = false) String name, @RequestParam(required = false) SortingParam sortingParam) {
-        Flux<User> users;
 
-        if (name != null && !name.isEmpty()) {
-            users = userService.getByName(name);
-        }else {
-            users = userService.getAll();
-        }
-
-        if (sortingParam != null) {
-            users = users.sort(new ByAgeComparator(sortingParam));
-        }
-
-        return users;
+        return userService.getAll(name, sortingParam);
     }
 
     @PostMapping("/")

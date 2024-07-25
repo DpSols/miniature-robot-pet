@@ -1,7 +1,9 @@
 package org.sample.samplegateway.service;
 
 import lombok.RequiredArgsConstructor;
+import org.sample.samplegateway.comparator.ByUserAgeComparator;
 import org.sample.samplegateway.datasource.postgres.UserDatasource;
+import org.sample.samplegateway.model.SortingParam;
 import org.sample.samplegateway.model.User;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -48,5 +50,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<Void> delete(int id) {
         return userDatasource.delete(id);
+    }
+
+    @Override
+    public Flux<User> getAll(String name, SortingParam sortingParam) {
+        Flux<User> users;
+
+        if (name != null && !name.isEmpty()) {
+            users = userDatasource.getByName(name);
+        }else {
+            users = userDatasource.getAll();
+        }
+
+        if (sortingParam != null) {
+            users = users.sort(new ByUserAgeComparator(sortingParam));
+        }
+        return users;
     }
 }

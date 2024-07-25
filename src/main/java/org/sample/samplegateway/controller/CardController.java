@@ -2,6 +2,7 @@ package org.sample.samplegateway.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.sample.samplegateway.model.Card;
+import org.sample.samplegateway.model.SortingParam;
 import org.sample.samplegateway.service.CardService;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -14,16 +15,9 @@ public class CardController {
     private final CardService cardService;
 
     @GetMapping("/")
-    public Flux<Card> getAllCard(@RequestParam(required = false) String cardName) {
-        Flux<Card> card;
+    public Flux<Card> getAllCard(@RequestParam(required = false) String cardName, @RequestParam(required = false) Integer holder_id, @RequestParam(required = false) SortingParam sortingParam) {
 
-        if (cardName != null && !cardName.isEmpty()) {
-            card = cardService.getByCardName(cardName);
-        } else {
-            card = cardService.getAll();
-        }
-
-        return card;
+        return cardService.getAll(holder_id, cardName, sortingParam);
     }
 
     @PostMapping("/")

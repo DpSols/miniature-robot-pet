@@ -8,6 +8,7 @@ public interface UserDatasource {
 
     Flux<User> getAll();
     Mono<User> getById(int id);
+    Mono<Boolean> existsById(int id);
     Flux<User> getByName(String Name);
     Mono<User> create(User user);
     Mono<User> update(User user);

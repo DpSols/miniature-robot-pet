@@ -1,5 +1,6 @@
 package org.sample.samplegateway.service;
 
+import org.sample.samplegateway.model.SortingParam;
 import org.sample.samplegateway.model.User;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,4 +17,6 @@ public interface UserService {
     Mono<User> update(User user);
 
     Mono<Void> delete(int id);
+
+    Flux<User> getAll(String name, SortingParam sortingParam);
 }

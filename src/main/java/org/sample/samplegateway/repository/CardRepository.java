@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
-
 @Repository
 public interface CardRepository extends ReactiveCrudRepository<Card, Integer> {
     @Query("SELECT * FROM cards WHERE name = :name")
@@ -17,7 +15,9 @@ public interface CardRepository extends ReactiveCrudRepository<Card, Integer> {
     @Query("SELECT * FROM cards WHERE number = :number")
     public Flux<Card> findByCardNumber(String number);
 
+    @Query("SELECT * FROM cards WHERE fk_user_id = :holderId")
+    public Flux<Card> findByCardHolder(int holderId);
+
     @Query("UPDATE cards SET fk_user_id = :userId, number = :number, expiry = :expiry, name = :name, balance = :balance WHERE id = :id")
     public Mono<Card> updateCard(int id, int userId, String number, String expiry, String name, int balance);
-    ;
 }

@@ -30,24 +30,34 @@ public class CardDatasourceImpl implements CardDatasource {
     }
 
     @Override
+    public Flux<Card> getByCardHolder(int holderId) {
+        return cardRepository.findByCardHolder(holderId);
+    }
+
+    @Override
     public Flux<Card> getByCardName(String cardName) {
         return cardRepository.findByCardName(cardName);
     }
 
     @Override
     public Mono<Card> create(Card card) {
+        if (!card.getExpiry().matches("^[0-9]{2}/[0-9]{2}$")) {
+            return Mono.error(new IllegalArgumentException("Expiry date must be in MM/YY format"));
+        }
         return cardRepository.save(card);
     }
 
     @Override
     public Mono<Card> update(Card card) {
-        String exp = card.getExpiry() != null ? card.getExpiry().format(DateTimeFormatter.ofPattern("MM/yy")) : null;
+        if (!card.getExpiry().matches("^[0-9]{2}/[0-9]{2}$")) {
+            return Mono.error(new IllegalArgumentException("Expiry date must be in MM/YY format"));
+        }
 
         return cardRepository.updateCard(
                 card.getId(),
                 card.getUserId(),
                 card.getNumber(),
-                exp,
+                card.getExpiry(),
                 card.getName(),
                 card.getBalance()
         );

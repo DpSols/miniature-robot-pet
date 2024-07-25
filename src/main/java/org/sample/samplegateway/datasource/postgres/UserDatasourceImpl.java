@@ -23,6 +23,11 @@ public class UserDatasourceImpl implements UserDatasource{
     }
 
     @Override
+    public Mono<Boolean> existsById(int id) {
+        return userRepository.existsById(id);
+    }
+
+    @Override
     public Flux<User> getByName(String Name) {
         return userRepository.findByName(Name);
     }

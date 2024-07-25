@@ -5,10 +5,10 @@ import org.sample.samplegateway.model.User;
 
 import java.util.Comparator;
 
-public class ByAgeComparator implements Comparator<User> {
+public class ByUserAgeComparator implements Comparator<User> {
     private SortingParam sortingParam;
 
-    public ByAgeComparator(SortingParam sortingParam) {
+    public ByUserAgeComparator(SortingParam sortingParam) {
         this.sortingParam = sortingParam;
     }
 

@@ -6,8 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDate;
-
 @AllArgsConstructor
 @Data
 @Table("cards")
@@ -19,7 +17,14 @@ public class Card {
     @Column("fk_user_id")
     private int userId;
     private String number;
-    private LocalDate expiry;
+    private String expiry;
     private String name;
     private int balance;
+
+    public void setExpiry(String expiry) {
+        if (!expiry.matches("^[0-9]{2}/[0-9]{2}$")) {
+            throw new IllegalArgumentException("Expiry date must be in MM/YY format");
+        }
+        this.expiry = expiry;
+    }
 }

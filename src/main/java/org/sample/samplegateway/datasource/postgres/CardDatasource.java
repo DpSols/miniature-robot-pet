@@ -8,6 +8,7 @@ public interface CardDatasource {
     Flux<Card> getAll();
     Mono<Card> getById(int id);
     Flux<Card> getByCardNumber(String cardNumber);
+    Flux<Card> getByCardHolder(int holderId);
     Flux<Card> getByCardName(String cardNumber);
     Mono<Card> create(Card card);
     Mono<Card> update(Card card);
