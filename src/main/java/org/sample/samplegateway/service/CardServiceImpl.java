@@ -94,6 +94,6 @@ public class CardServiceImpl implements CardService {
 
         card.sort();
 
-        return null;
+        return card;
     }
 }
