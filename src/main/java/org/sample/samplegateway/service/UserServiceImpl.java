@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Flux<User> getAll(String name, SortingParam sortingParam) {
+    public Flux<User> getAll(String name, SortingParam sortingParam ) {
         Flux<User> users;
 
         if (name != null && !name.isEmpty()) {

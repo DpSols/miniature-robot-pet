@@ -1,28 +1,29 @@
 package org.sample.samplegateway.service;
 
-import org.sample.samplegateway.model.Card;
+import org.sample.samplegateway.dto.CardDto;
+import org.sample.samplegateway.dto.GetCustomerCardResponse;
 import org.sample.samplegateway.model.SortingParam;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CardService {
-    Flux<Card> getAll();
+    Flux<CardDto> getAll();
 
-    Mono<Card> getById(int id);
+    Mono<CardDto> getById(int id);
 
-    Flux<Card> getByCardNumber(String cardNumber);
+    Flux<CardDto> getByCardNumber(String cardNumber);
 
-    Flux<Card> getByCardName(String cardName);
+    Flux<CardDto> getByCardName(String cardName);
 
-    Flux<Card> getByCardHolder(int holderId);
+    Mono<GetCustomerCardResponse> getByCardHolder(int holderId);
 
-    Flux<Card> getByCardHolderAndCardName(int holderId, String name);
+    Flux<GetCustomerCardResponse> getByCardHolderAndCardName(int holderId, String name);
 
-    Mono<Card> create(Card card);
+    Mono<CardDto> create(CardDto card);
 
-    Mono<Card> update(Card card);
+    Mono<CardDto> update(CardDto card);
 
     Mono<Void> delete(int id);
 
-    Flux<Card> getAll(Integer holderId, String cardName, SortingParam sortingParam);
+    Mono<GetCustomerCardResponse> getAll(Integer holderId, String cardName, SortingParam sortingParam);
 }

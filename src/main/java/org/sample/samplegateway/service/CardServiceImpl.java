@@ -3,8 +3,13 @@ package org.sample.samplegateway.service;
 import lombok.RequiredArgsConstructor;
 import org.sample.samplegateway.datasource.postgres.CardDatasource;
 import org.sample.samplegateway.datasource.postgres.UserDatasource;
+import org.sample.samplegateway.dto.CardDto;
+import org.sample.samplegateway.dto.GetCustomerCardResponse;
+import org.sample.samplegateway.dto.UserDto;
 import org.sample.samplegateway.model.Card;
 import org.sample.samplegateway.model.SortingParam;
+import org.sample.samplegateway.repository.mapper.CardMapper;
+import org.sample.samplegateway.repository.mapper.UserMapper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,50 +21,66 @@ public class CardServiceImpl implements CardService {
     private final CardDatasource cardDatasource;
 
     @Override
-    public Flux<Card> getAll() {
-        return cardDatasource.getAll();
+    public Flux<CardDto> getAll() {
+        return cardDatasource.getAll()
+                .map(CardMapper::toDto);
     }
 
     @Override
-    public Mono<Card> getById(int id) {
-        return cardDatasource.getById(id);
+    public Mono<CardDto> getById(int id) {
+        return cardDatasource.getById(id)
+                .map(CardMapper::toDto);
     }
 
     @Override
-    public Flux<Card> getByCardNumber(String cardNumber) {
-        return cardDatasource.getByCardNumber(cardNumber);
+    public Flux<CardDto> getByCardNumber(String cardNumber) {
+        return cardDatasource.getByCardNumber(cardNumber)
+                .map(CardMapper::toDto);
     }
 
     @Override
-    public Flux<Card> getByCardName(String cardName) {
-        return cardDatasource.getByCardName(cardName);
+    public Flux<CardDto> getByCardName(String cardName) {
+        return cardDatasource.getByCardName(cardName)
+                .map(CardMapper::toDto);
     }
 
     @Override
-    public Flux<Card> getByCardHolder(int holderId) {
-        return cardDatasource.getByCardHolder(holderId);
+    public Mono<GetCustomerCardResponse> getByCardHolder(int holderId) {
+        Mono<UserDto> user = userDatasource.getById(holderId)
+                .switchIfEmpty(Mono.error(new Exception("No user found for id " + holderId)))
+                .map(UserMapper::toDto);
+
+        Flux<CardDto> cards = cardDatasource.getByCardHolder(holderId)
+                .map(CardMapper::toDto);
+
+        return user.flatMap(userDto -> cards.collectList()
+                        .map(cardDtos -> new GetCustomerCardResponse(userDto, cardDtos)));
     }
 
     @Override
-    public Flux<Card> getByCardHolderAndCardName(int holderId, String name) {
+    public Flux<GetCustomerCardResponse> getByCardHolderAndCardName(int holderId, String name) {
         return null;
     }
 
     @Override
-    public Mono<Card> create(Card card) {
-        return userDatasource.existsById(card.getUserId())
-                .flatMap(exists -> {
-                    if (!exists) {
-                        return Mono.error(new IllegalArgumentException("User with id " + card.getUserId() + " does not exist"));
-                    }
-                    return cardDatasource.create(card);
-                });
+    public Mono<CardDto> create(CardDto cardDto) {
+//        return userDatasource.existsById(card.getUserId())
+//                .flatMap(exists -> {
+//                    if (!exists) {
+//                        return Mono.error(new IllegalArgumentException("User with id " + card.getUserId() + " does not exist"));
+//                    }
+//                    return cardDatasource.create(card);
+//                });
+
+        return cardDatasource.create(CardMapper.toModel(cardDto))
+                .map(CardMapper::toDto);
     }
 
     @Override
-    public Mono<Card> update(Card card) {
+    public Mono<CardDto> update(Card card) {
         if (card.getUserId() == 0) {
-            return cardDatasource.update(card);
+            return cardDatasource.update(card)
+                    .map(CardMapper::toDto);
         }
 
         return userDatasource.existsById(card.getUserId())
@@ -68,7 +89,8 @@ public class CardServiceImpl implements CardService {
                         return Mono.error(new IllegalArgumentException("User with id " + card.getUserId() + " does not exist"));
                     }
 
-                    return cardDatasource.update(card);
+                    return cardDatasource.update(card)
+                            .map(CardMapper::toDto);
                 });
     }
 
@@ -78,22 +100,29 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Flux<Card> getAll(Integer holderId, String cardName, SortingParam sortingParam) {
-        Flux<Card> card;
+    public Mono<GetCustomerCardResponse> getAll(Integer holderId, String cardName, SortingParam sortingParam) {
+        Flux<CardDto> cards;
+
+        Mono<UserDto> user = userDatasource.getById(holderId)
+                .switchIfEmpty(Mono.error(new Exception("No user found for id " + holderId)))
+                .map(UserMapper::toDto);
 
         if (holderId != null) {
-            card = cardDatasource.getByCardHolder(holderId)
+            cards = cardDatasource.getByCardHolder(holderId)
                     .filter(c -> cardName == null || cardName.isEmpty() || c.getName().equals(cardName))
+                    .map(CardMapper::toDto)
                     .switchIfEmpty(Flux.error(new Exception("No card found for holder id " + holderId)));
         } else if (cardName != null && !cardName.isEmpty()) {
-            card = cardDatasource.getByCardName(cardName)
+            cards = cardDatasource.getByCardName(cardName)
+                    .map(CardMapper::toDto)
                     .switchIfEmpty(Flux.error(new Exception("No card found with name " + cardName)));
         } else {
-            card = cardDatasource.getAll();
+            cards = cardDatasource.getAll()
+                    .map(CardMapper::toDto);
         }
 
-        card.sort();
-
-        return card;
+        // todo sorting
+        return user.flatMap(userDto -> cards.collectList()
+                        .map(cardDtos -> new GetCustomerCardResponse(userDto, cardDtos)));
     }
 }

@@ -15,9 +15,8 @@ public class CardController {
     private final CardService cardService;
 
     @GetMapping("/")
-    public Flux<Card> getAllCard(@RequestParam(required = false) String cardName, @RequestParam(required = false) Integer holder_id, @RequestParam(required = false) SortingParam sortingParam) {
-
-        return cardService.getAll(holder_id, cardName, sortingParam);
+    public Flux<Card> getAllCard(@RequestParam(required = false) String cardName, @RequestParam(required = false) Integer holderId, @RequestParam(required = false) SortingParam sortingParam) {
+        return cardService.getAll(holderId, cardName, sortingParam);
     }
 
     @PostMapping("/")
